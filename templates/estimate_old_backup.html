@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Damage Analysis Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .estimate-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .header {
+            background: white;
+            color: #1a202c;
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            color: #1a202c;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2 i {
+            color: #4299e1;
+        }
+        
+        /* Image Gallery Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .image-card-title {
+            padding: 15px;
+            background: #f7fafc;
+            color: #2d3748;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        /* Severity Badge */
+        .severity-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+        
+        .severity-MINOR {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .severity-MODERATE {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .severity-SEVERE {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        /* Confidence Score */
+        .confidence-container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .confidence-score {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #4299e1;
+            margin: 10px 0;
+        }
+        
+        .confidence-verdict {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-top: 10px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #4299e1;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #f7fafc;
+            color: #2d3748;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .total-cost {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 24px;
+            background: #4299e1;
+            color: white;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        
+        /* Fraud Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .alert i {
+            font-size: 2rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            color: #155724;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            color: #721c24;
+        }
+        
+        /* Progress Bars */
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4299e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease;
+            border-radius: 15px;
+        }
+        
+        /* Navigation Buttons */
+        .nav-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #4299e1;
+            border: 2px solid #4299e1;
+        }
+        
+        .btn-secondary:hover {
+            background: #4299e1;
+            color: white;
+        }
+        
+        /* Explanation Text */
+        .explanation-text {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            border-left: 4px solid #667eea;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* Cost Band Badge */
+        .cost-band {
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        
+        .cost-LOW {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .cost-MEDIUM {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .cost-HIGH {
+            background: #e67e22;
+            color: white;
+        }
+        
+        .cost-CRITICAL {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        /* Risk Badge Styles */
+        .risk-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .risk-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .risk-critical {
+            background: #721c24;
+            color: white;
+        }
+        
+        @media print {
+            .nav-buttons, .btn {
+                display: none;
+            }
+            body {
+                background: white;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .image-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-buttons">
+        <a href="/dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <a href="/logout" class="btn btn-secondary">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+    
+    <div class="estimate-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> AI-Powered Damage Analysis Report</h1>
+            <p>Comprehensive Multimodal Assessment with Deep Learning</p>
+        </div>
+        
+        <div class="content">
+            <!-- Overall Confidence Score -->
+            {% if confidence %}
+            <div class="section">
+                <h2><i class="fas fa-chart-line"></i> Claim Confidence Analysis</h2>
+                <div class="confidence-container">
+                    <div class="confidence-score">{{ "%.1f"|format(confidence.confidence_score) }}%</div>
+                    <div class="confidence-verdict">
+                        Verdict: <strong>{{ confidence.verdict }}</strong>
+                    </div>
+                    <p style="margin-top: 15px; color: #7f8c8d;">
+                        Risk Level: <span class="risk-badge risk-{{ confidence.risk_level.lower() }}">{{ confidence.risk_level }}</span>
+                        <br>
+                        Recommendation: <strong>{{ confidence.recommendation }}</strong>
+                    </p>
+                </div>
+                
+                <div class="stats-grid" style="margin-top: 30px;">
+                    <div class="stat-card">
+                        <i class="fas fa-balance-scale"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.text_image_consistency) }}%</div>
+                        <div class="stat-label">Text-Image Consistency</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.authenticity) }}%</div>
+                        <div class="stat-label">Authenticity</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.damage_plausibility) }}%</div>
+                        <div class="stat-label">Damage Plausibility</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-history"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.claim_frequency) }}%</div>
+                        <div class="stat-label">Claim History</div>
+                    </div>
+                </div>
+                
+                <!-- Confidence Explanations -->
+                {% if confidence.explanations %}
+                <div style="margin-top: 25px; padding: 20px; background: white; border-radius: 10px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;"><i class="fas fa-info-circle"></i> Analysis Details</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        {% for explanation in confidence.explanations %}
+                        <li style="padding: 8px 0; border-bottom: 1px solid #ecf0f1;">
+                            {{ explanation }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Text Attention Analysis -->
+            {% if text_attention and claim_description %}
+            <div class="section">
+                <h2><i class="fas fa-highlighter"></i> Claim Description Analysis</h2>
+                
+                <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #4299e1; margin-bottom: 25px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">
+                        <i class="fas fa-file-alt"></i> Highlighted Description
+                    </h3>
+                    <p style="color: #718096; font-size: 0.9rem; margin-bottom: 15px;">
+                        Important keywords are color-coded to show how the description aligns with detected damage:
+                    </p>
+                    
+                    <!-- Legend -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #22c55e20; border: 2px solid #22c55e; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Green</strong> = Detected & Mentioned ✓</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #ef444420; border: 2px solid #ef4444; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Red</strong> = Mentioned but Not Detected ⚠</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #f59e0b20; border: 2px solid #f59e0b; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Orange</strong> = Severity Term</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #3b82f620; border: 2px solid #3b82f6; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Blue</strong> = Damage Indicator</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Highlighted Text -->
+                    <div style="background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 2; font-size: 1.05rem;">
+                        {{ text_attention.highlighted_html|safe }}
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                {% if text_attention.statistics %}
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">
+                        <i class="fas fa-chart-bar"></i> Text-Image Consistency Metrics
+                    </h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                            <div class="stat-value" style="color: #22c55e;">{{ text_attention.statistics.matched_parts }}</div>
+                            <div class="stat-label">Matched Parts</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                            <div class="stat-value" style="color: #ef4444;">{{ text_attention.statistics.unmatched_parts }}</div>
+                            <div class="stat-label">Unmatched Parts</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-percentage"></i>
+                            <div class="stat-value">{{ text_attention.statistics.match_rate }}%</div>
+                            <div class="stat-label">Match Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-tag"></i>
+                            <div class="stat-value">{{ text_attention.statistics.severity_terms }}</div>
+                            <div class="stat-label">Severity Terms</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Insights -->
+                {% if text_attention.insights and text_attention.insights|length > 0 %}
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 4px solid #4299e1;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">
+                        <i class="fas fa-lightbulb"></i> AI Insights
+                    </h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% for insight in text_attention.insights %}
+                        <li style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #2d3748;">
+                            {{ insight }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- AI Visualizations -->
+            <div class="section">
+                <h2><i class="fas fa-eye"></i> AI Visual Analysis</h2>
+                <div class="image-grid">
+                    <div class="image-card">
+                        <div class="image-card-title">Original Image</div>
+                        <img src="{{ url_for('static', filename=original_image) }}" alt="Original">
+                    </div>
+                    
+                    <div class="image-card">
+                        <div class="image-card-title">YOLO Damage Detection</div>
+                        <img src="{{ url_for('static', filename=detected_image) }}" alt="Detected">
+                    </div>
+                    
+                    <div class="image-card">
+                        <div class="image-card-title">Explainability Annotations</div>
+                        <img src="{{ url_for('static', filename=explanation_image) }}" alt="Explanation">
+                    </div>
+                    
+                    <div class="image-card">
+                        <div class="image-card-title">Attention Heatmap</div>
+                        <img src="{{ url_for('static', filename=heatmap_image) }}" alt="Heatmap">
+                    </div>
+                </div>
+                
+                {% if fraud_analysis and fraud_analysis.advanced_forensics and fraud_analysis.advanced_forensics.ela_visualization_path %}
+                <div class="image-grid" style="margin-top: 20px;">
+                    <div class="image-card">
+                        <div class="image-card-title" style="background: #e74c3c;">
+                            🔍 Error Level Analysis (Forensics)
+                        </div>
+                        <img src="{{ '/' + fraud_analysis.advanced_forensics.ela_visualization_path }}" alt="ELA Forensics">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Severity Analysis -->
+            {% if severity %}
+            <div class="section">
+                <h2><i class="fas fa-exclamation-triangle"></i> Damage Severity Assessment</h2>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <span class="severity-badge severity-{{ severity.severity }}">
+                        {{ severity.severity }}
+                    </span>
+                    
+                    {% if severity_enhanced and severity_enhanced.cnn_prediction %}
+                    <p style="margin-top: 15px; color: #667eea; font-weight: 600;">
+                        <i class="fas fa-brain"></i> CNN Analysis: {{ severity_enhanced.severity }} 
+                        (Confidence: {{ "%.1f"|format(severity_enhanced.cnn_prediction.confidence * 100) }}%)
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ severity.severity_score }}%">
+                        {{ "%.0f"|format(severity.severity_score) }}/100
+                    </div>
+                </div>
+                
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <i class="fas fa-tools"></i>
+                        <div class="stat-value">{{ severity.num_damaged_parts }}</div>
+                        <div class="stat-label">Parts Damaged</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-indian-rupee-sign"></i>
+                        <div class="stat-value">{{ cost_band.band if cost_band and cost_band.band else 'N/A' }}</div>
+                        <div class="stat-label">Cost Band</div>
+                    </div>
+                </div>
+                
+                {% if severity_enhanced and severity_enhanced.cnn_prediction %}
+                <div style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 10px; color: #2c3e50;">
+                        <i class="fas fa-chart-bar"></i> CNN Probability Distribution
+                    </h3>
+                    {% for class_name, prob in severity_enhanced.cnn_prediction.probabilities.items() %}
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>{{ class_name }}</span>
+                            <span>{{ "%.1f"|format(prob * 100) }}%</span>
+                        </div>
+                        <div class="progress-bar" style="height: 20px;">
+                            <div class="progress-fill" style="width: {{ prob * 100 }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Grad-CAM Visualization -->
+                {% if gradcam_image %}
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">
+                        <i class="fas fa-fire"></i> Grad-CAM: Model Attention Visualization
+                    </h3>
+                    <div style="background: white; padding: 15px; border-radius: 10px; border: 2px solid #4299e1;">
+                        <p style="color: #718096; margin-bottom: 15px; font-size: 0.9rem;">
+                            <strong>What is this?</strong> Grad-CAM shows which parts of the image the AI model focused on to predict <strong>{{ severity_enhanced.severity }}</strong> severity. 
+                            Brighter (warmer) regions indicate areas the model considered most important for its decision.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="{{ url_for('static', filename=gradcam_image) }}" 
+                                 alt="Grad-CAM Heatmap" 
+                                 style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: #f7fafc; border-radius: 8px; border-left: 4px solid #4299e1;">
+                            <p style="color: #2d3748; font-size: 0.9rem; margin: 0;">
+                                <i class="fas fa-info-circle" style="color: #4299e1;"></i>
+                                <strong>Interpretation:</strong> Red/Yellow areas = High attention | Blue/Purple areas = Low attention
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Fraud Detection -->
+            {% if fraud_analysis %}
+            <div class="section">
+                <h2><i class="fas fa-user-secret"></i> Fraud Detection Analysis</h2>
+                
+                {% if fraud_analysis.advanced_forensics %}
+                <div class="alert {% if fraud_analysis.advanced_forensics.is_manipulated %}alert-danger{% else %}alert-success{% endif %}">
+                    <i class="fas {% if fraud_analysis.advanced_forensics.is_manipulated %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                    <div>
+                        <strong>Image Forensics: {{ 'MANIPULATED' if fraud_analysis.advanced_forensics.is_manipulated else 'AUTHENTIC' }}</strong>
+                        <p style="margin-top: 5px;">
+                            Confidence: {{ "%.1f"|format(fraud_analysis.advanced_forensics.confidence * 100) }}%
+                            {% if fraud_analysis.advanced_forensics.method %}
+                            | Method: {{ fraud_analysis.advanced_forensics.method }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <i class="fas fa-compress"></i>
+                        <div class="stat-value">{{ "%.2f"|format(fraud_analysis.advanced_forensics.ela_score) }}</div>
+                        <div class="stat-label">ELA Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-random"></i>
+                        <div class="stat-value">{{ "%.2f"|format(fraud_analysis.advanced_forensics.noise_inconsistency) }}</div>
+                        <div class="stat-label">Noise Inconsistency</div>
+                    </div>
+                    {% if fraud_analysis.advanced_forensics.cnn_fake_probability %}
+                    <div class="stat-card">
+                        <i class="fas fa-brain"></i>
+                        <div class="stat-value">{{ "%.1f"|format(fraud_analysis.advanced_forensics.cnn_fake_probability * 100) }}%</div>
+                        <div class="stat-label">CNN Fake Probability</div>
+                    </div>
+                    {% endif %}
+                    <div class="stat-card">
+                        <i class="fas fa-camera"></i>
+                        <div class="stat-value">{{ "%.2f"|format(fraud_analysis.advanced_forensics.exif_suspicion) }}</div>
+                        <div class="stat-label">EXIF Suspicion</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if fraud_analysis.duplicate %}
+                <div class="alert {% if fraud_analysis.duplicate.is_duplicate %}alert-warning{% else %}alert-success{% endif %}" style="margin-top: 15px;">
+                    <i class="fas {% if fraud_analysis.duplicate.is_duplicate %}fa-copy{% else %}fa-check{% endif %}"></i>
+                    <div>
+                        <strong>Duplicate Check: {{ 'DUPLICATE FOUND' if fraud_analysis.duplicate.is_duplicate else 'UNIQUE IMAGE' }}</strong>
+                        {% if fraud_analysis.duplicate.is_duplicate %}
+                        <p style="margin-top: 5px;">
+                            Similar to {{ fraud_analysis.duplicate.similar_count }} previous claim(s)
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if fraud_analysis.claim_frequency %}
+                <div class="alert {% if fraud_analysis.claim_frequency.is_suspicious %}alert-warning{% else %}alert-success{% endif %}" style="margin-top: 15px;">
+                    <i class="fas fa-history"></i>
+                    <div>
+                        <strong>Claim Frequency: {{ 'SUSPICIOUS' if fraud_analysis.claim_frequency.is_suspicious else 'NORMAL' }}</strong>
+                        <p style="margin-top: 5px;">
+                            {{ fraud_analysis.claim_frequency.claim_count }} claim(s) in past 30 days
+                            {% if fraud_analysis.claim_frequency.pattern %}
+                            | Pattern: {{ fraud_analysis.claim_frequency.pattern }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Repair Costs -->
+            <div class="section">
+                <h2><i class="fas fa-indian-rupee-sign"></i> Estimated Repair Costs</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-cog"></i> Part Name</th>
+                            <th><i class="fas fa-hashtag"></i> Count</th>
+                            <th><i class="fas fa-indian-rupee-sign"></i> Price per Part</th>
+                            <th><i class="fas fa-indian-rupee-sign"></i> Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if part_prices and part_prices|length > 0 %}
+                            {% for part, details in part_prices.items() %}
+                            <tr>
+                                <td><strong>{{ part }}</strong></td>
+                                <td>{{ details.get('count', 0) }}</td>
+                                <td>₹{{ "{:,.0f}".format(details.get('price', 0)) }}</td>
+                                <td>₹{{ "{:,.0f}".format(details.get('total', 0)) }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 20px; color: #718096;">
+                                    No part price data available
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                
+                <div class="total-cost">
+                    <i class="fas fa-indian-rupee-sign"></i> 
+                    Total Estimated Cost: ₹{{ "{:,.0f}".format(part_prices.values() | map(attribute='total') | sum) if part_prices else 0 }}
+                </div>
+                
+                {% if cost_band and cost_band.band %}
+                <div style="text-align: center; margin-top: 20px;">
+                    <span class="cost-band cost-{{ cost_band.band }}">
+                        {{ cost_band.band }} Risk Category
+                    </span>
+                    <p style="margin-top: 10px; color: #7f8c8d;">
+                        Risk Level: {{ cost_band.get('risk', 'Unknown') }}
+                    </p>
+                </div>
+                {% else %}
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                    <p style="color: #718096;">Cost band information not available</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Textual Explanation -->
+            {% if textual_explanation %}
+            <div class="section">
+                <h2><i class="fas fa-file-alt"></i> Detailed Analysis Report</h2>
+                <div class="explanation-text">{{ textual_explanation }}</div>
+            </div>
+            {% endif %}
+            
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Report
+                </button>
+                <a href="/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-upload"></i> Submit Another Claim
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Animate progress bars on load
+        window.addEventListener('load', function() {
+            const fills = document.querySelectorAll('.progress-fill');
+            fills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        });
+        
+        // Animate confidence score
+        const scoreElement = document.querySelector('.confidence-score');
+        if (scoreElement) {
+            const targetScore = parseFloat(scoreElement.textContent);
+            let currentScore = 0;
+            const increment = targetScore / 50;
+            const timer = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = currentScore.toFixed(1) + '%';
+            }, 20);
+        }
+    </script>
+</body>
+</html>

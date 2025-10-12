@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ESPER</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Poppins', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex items-center justify-center p-4">
+    
+    <div class="w-full max-w-2xl">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <a href="{{ url_for('index') }}" class="inline-flex items-center space-x-3 mb-3">
+                <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center">
+                    <i class="fas fa-car-crash text-white text-2xl"></i>
+                </div>
+                <span class="font-display text-3xl font-bold gradient-text">ESPER</span>
+            </a>
+            <p class="text-gray-600 mt-2">Create your account to get started</p>
+        </div>
+        
+        <!-- Signup Card -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <h2 class="font-display text-2xl font-bold text-gray-900 mb-6 text-center">
+                Sign Up for Free
+            </h2>
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-xl {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                        <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <!-- Full Name -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-user text-gray-400 mr-2"></i>
+                            Full Name
+                        </label>
+                        <input type="text" 
+                               name="name" 
+                               required 
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                               placeholder="John Doe">
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-envelope text-gray-400 mr-2"></i>
+                            Email Address
+                        </label>
+                        <input type="email" 
+                               name="email" 
+                               required 
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                               placeholder="you@example.com">
+                    </div>
+                    
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-lock text-gray-400 mr-2"></i>
+                            Password
+                        </label>
+                        <input type="password" 
+                               name="password" 
+                               required 
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                               placeholder="••••••••">
+                    </div>
+                    
+                    <!-- Phone Number -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-phone text-gray-400 mr-2"></i>
+                            Phone Number
+                        </label>
+                        <input type="tel" 
+                               name="phoneNumber" 
+                               required 
+                               maxlength="20"
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                               placeholder="1234567890">
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <!-- Vehicle ID -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-id-card text-gray-400 mr-2"></i>
+                            Vehicle Registration Number
+                        </label>
+                        <input type="text" 
+                               name="vehicleId" 
+                               required 
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                               placeholder="e.g., MH12AB1234">
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
+                            Address
+                        </label>
+                        <textarea name="address" 
+                                  required 
+                                  rows="2"
+                                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                                  placeholder="Your complete address"></textarea>
+                    </div>
+                    
+                    <!-- Car Brand -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-car text-gray-400 mr-2"></i>
+                            Car Brand
+                        </label>
+                        <select name="carBrand" 
+                                required 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+                            <option value="">Select Brand</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Maruti">Maruti Suzuki</option>
+                            <option value="Hyundai">Hyundai</option>
+                            <option value="Tata">Tata</option>
+                            <option value="Mahindra">Mahindra</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Car Model -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-car-side text-gray-400 mr-2"></i>
+                            Car Model
+                        </label>
+                        <input type="text" 
+                               name="carModel" 
+                               required 
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                               placeholder="e.g., Camry, City">
+                    </div>
+                </div>
+                
+                <!-- Terms and Conditions -->
+                <div class="mb-6">
+                    <label class="flex items-start">
+                        <input type="checkbox" required class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-0.5">
+                        <span class="ml-3 text-gray-600 text-sm">
+                            I agree to the <a href="#" class="text-purple-600 hover:text-purple-700 font-medium">Terms of Service</a> and 
+                            <a href="#" class="text-purple-600 hover:text-purple-700 font-medium">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" 
+                        class="w-full gradient-bg text-white py-3 rounded-xl font-semibold text-lg hover:shadow-lg transform hover:scale-[1.02] transition-all">
+                    Create Account
+                </button>
+            </form>
+            
+            <!-- Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-4 bg-white text-gray-500">Or sign up with</span>
+                </div>
+            </div>
+            
+            <!-- Social Signup -->
+            <div class="grid grid-cols-2 gap-4">
+                <button class="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-gray-300 rounded-xl hover:border-purple-500 transition-all">
+                    <i class="fab fa-google text-red-500"></i>
+                    <span class="font-medium text-gray-700">Google</span>
+                </button>
+                <button class="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-gray-300 rounded-xl hover:border-purple-500 transition-all">
+                    <i class="fab fa-github text-gray-800"></i>
+                    <span class="font-medium text-gray-700">GitHub</span>
+                </button>
+            </div>
+            
+            <!-- Login Link -->
+            <p class="mt-6 text-center text-gray-600">
+                Already have an account? 
+                <a href="{{ url_for('login') }}" class="text-purple-600 hover:text-purple-700 font-semibold">
+                    Sign in
+                </a>
+            </p>
+        </div>
+        
+        <!-- Footer Links -->
+        <div class="mt-6 text-center text-sm text-gray-500">
+            <a href="{{ url_for('index') }}" class="hover:text-purple-600 transition-colors">← Back to Home</a>
+        </div>
+    </div>
+    
+</body>
+</html>

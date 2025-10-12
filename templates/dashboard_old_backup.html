@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Damage Detection Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f5f7fa;
+            padding: 20px;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        body::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .dashboard-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+            box-sizing: border-box;
+            margin-top: 60px;
+            border: 1px solid #e2e8f0;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1a202c;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 2.25rem;
+            font-weight: 700;
+        }
+
+        .intro {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            animation: slideIn 1s ease-out;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .feature i {
+            font-size: 2.5rem;
+            color: #4299e1;
+            margin-bottom: 1rem;
+        }
+
+        .upload-container {
+            border: 2px dashed #cbd5e0;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background-color: #f7fafc;
+        }
+
+        .upload-container:hover {
+            background-color: #edf2f7;
+            border-color: #4299e1;
+            transform: translateY(-2px);
+        }
+
+        .upload-container input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-label {
+            font-size: 1.2rem;
+            color: #4299e1;
+            pointer-events: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+
+        #image-preview {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #image-preview:hover {
+            transform: scale(1.02);
+        }
+
+        .nav-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .home-button, .user-profile {
+            background-color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .home-button:hover, .user-profile:hover {
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .home-button i, .user-profile i {
+            font-size: 1.2rem;
+            color: #4299e1;
+        }
+
+        .user-profile {
+            position: relative;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .user-profile:hover .profile-dropdown {
+            display: block;
+        }
+
+        .profile-dropdown a {
+            display: block;
+            padding: 8px 15px;
+            color: #2c3e50;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .profile-dropdown a:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="nav-buttons">
+            <a href="/" class="home-button">
+                <i class="fas fa-home"></i>
+            </a>
+            <div class="user-profile">
+                <i class="fas fa-user-circle"></i>
+                <div class="profile-dropdown">
+                    <a href="/view_profile">View Profile</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-content">
+            <h2>Smart Damage Detection Dashboard</h2>
+            <p class="intro">
+                Welcome to our cutting-edge vehicle damage detection system. Powered by advanced YOLOv8 AI technology, 
+                this tool revolutionizes the way we assess and estimate vehicle repairs. Whether you're an insurance 
+                adjuster, a car owner, or a repair shop manager, our system provides quick, accurate, and reliable damage assessments.
+            </p>
+
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Fast Analysis</h3>
+                    <p>Get results in seconds</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-bullseye"></i>
+                    <h3>High Accuracy</h3>
+                    <p>Powered by YOLOv8 AI</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-indian-rupee-sign"></i>
+                    <h3>Cost Estimation</h3>
+                    <p>Instant repair quotes in ₹</p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="upload-container">
+                    <label class="upload-label">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i><br>
+                        Drag and Drop Your Image Here<br>or Click to Upload
+                    </label>
+                    <input type="file" id="file-upload" name="image" accept="image/*" onchange="handleFileUpload(event)" required>
+                </div>
+                <img id="image-preview" src="#" alt="Image Preview">
+                
+                <!-- Claim Description Textarea -->
+                <div style="margin: 1.5rem 0;">
+                    <label for="description" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                        Describe the Damage (Optional but Recommended):
+                    </label>
+                    <textarea 
+                        id="description" 
+                        name="description" 
+                        rows="4" 
+                        placeholder="Example: Front bumper severely damaged due to collision. Left headlight broken. Driver side door has deep scratches and dent..."
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.95rem; resize: vertical; transition: border-color 0.3s;"
+                        onfocus="this.style.borderColor='#6ab7f5'" 
+                        onblur="this.style.borderColor='#ddd'"
+                    ></textarea>
+                    <small style="color: #666; font-size: 0.85rem;">
+                        <i class="fas fa-info-circle"></i> Adding a description improves analysis accuracy and enables fraud detection
+                    </small>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-calculator"></i> Analyze Damage & Estimate Cost
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function handleFileUpload(event) {
+            const fileInput = event.target;
+            const preview = document.getElementById('image-preview');
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    preview.style.animation = 'fadeIn 0.5s ease-out';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>

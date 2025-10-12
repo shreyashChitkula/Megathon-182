@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Report - ESPER</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        .font-display { font-family: 'Poppins', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(to br, #f5f7fa, #e5e7eb);
+            min-height: 100vh;
+        }
+        
+        .estimate-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .header {
+            background: white;
+            color: #1a202c;
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            color: #1a202c;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2 i {
+            color: #4299e1;
+        }
+        
+        /* Image Gallery Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .image-card-title {
+            padding: 15px;
+            background: #f7fafc;
+            color: #2d3748;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        /* Severity Badge */
+        .severity-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+        
+        .severity-MINOR {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .severity-MODERATE {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .severity-SEVERE {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        /* Confidence Score */
+        .confidence-container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .confidence-score {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #4299e1;
+            margin: 10px 0;
+        }
+        
+        .confidence-verdict {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-top: 10px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #4299e1;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #f7fafc;
+            color: #2d3748;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .total-cost {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 24px;
+            background: #4299e1;
+            color: white;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        
+        /* Fraud Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .alert i {
+            font-size: 2rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            color: #155724;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            color: #721c24;
+        }
+        
+        /* Progress Bars */
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4299e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease;
+            border-radius: 15px;
+        }
+        
+        /* Navigation Buttons */
+        .nav-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #4299e1;
+            border: 2px solid #4299e1;
+        }
+        
+        .btn-secondary:hover {
+            background: #4299e1;
+            color: white;
+        }
+        
+        /* Explanation Text */
+        .explanation-text {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            border-left: 4px solid #667eea;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* Cost Band Badge */
+        .cost-band {
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        
+        .cost-LOW {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .cost-MEDIUM {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .cost-HIGH {
+            background: #e67e22;
+            color: white;
+        }
+        
+        .cost-CRITICAL {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        /* Risk Badge Styles */
+        .risk-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .risk-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .risk-critical {
+            background: #721c24;
+            color: white;
+        }
+        
+        @media print {
+            .nav-buttons, .btn {
+                display: none;
+            }
+            body {
+                background: white;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .image-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* Floating Warning Animations */
+        @keyframes slideDown {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
+        }
+        
+        /* Make floating warning responsive */
+        @media (max-width: 768px) {
+            #floatingConsistencyWarning {
+                top: 80px !important;
+                max-width: 95% !important;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <!-- Modern Navigation -->
+    <div class="max-w-7xl mx-auto mb-6 flex justify-between items-center">
+        <a href="/dashboard" class="flex items-center space-x-2 px-6 py-3 bg-white border-2 border-gray-300 rounded-xl hover:border-purple-500 transition-all font-semibold text-gray-700">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Dashboard</span>
+        </a>
+        <a href="/logout" class="flex items-center space-x-2 px-6 py-3 bg-red-50 border-2 border-red-200 rounded-xl hover:bg-red-100 transition-all font-semibold text-red-700">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+    
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <!-- Modern Header -->
+        <div class="gradient-bg text-white p-8 md:p-12">
+            <h1 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-3 flex items-center gap-3">
+                <i class="fas fa-robot"></i> 
+                AI-Powered Damage Analysis
+            </h1>
+            <p class="text-xl opacity-90">Comprehensive Multimodal Assessment with Deep Learning</p>
+        </div>
+        
+        <div class="p-6 md:p-10 space-y-8">
+            <!-- Overall Confidence Score -->
+            {% if confidence %}
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-8 border border-purple-200">
+                <h2 class="font-display text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <i class="fas fa-chart-line text-purple-600"></i> 
+                    Claim Confidence Analysis
+                </h2>
+                <div class="confidence-container">
+                    <div class="confidence-score">{{ "%.1f"|format(confidence.confidence_score) }}%</div>
+                    <div class="confidence-verdict">
+                        Verdict: <strong>{{ confidence.verdict }}</strong>
+                    </div>
+                    <p style="margin-top: 15px; color: #7f8c8d;">
+                        Risk Level: <span class="risk-badge risk-{{ confidence.risk_level.lower() }}">{{ confidence.risk_level }}</span>
+                        <br>
+                        Recommendation: <strong>{{ confidence.recommendation }}</strong>
+                    </p>
+                </div>
+                
+                <div class="stats-grid" style="margin-top: 30px;">
+                    <div class="stat-card">
+                        <i class="fas fa-balance-scale"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.text_image_consistency) }}%</div>
+                        <div class="stat-label">Text-Image Consistency</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.authenticity) }}%</div>
+                        <div class="stat-label">Authenticity</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.damage_plausibility) }}%</div>
+                        <div class="stat-label">Damage Plausibility</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-history"></i>
+                        <div class="stat-value">{{ "%.0f"|format(confidence.component_scores.claim_frequency) }}%</div>
+                        <div class="stat-label">Claim History</div>
+                    </div>
+                </div>
+                
+                <!-- Confidence Explanations -->
+                {% if confidence.explanations %}
+                <div style="margin-top: 25px; padding: 20px; background: white; border-radius: 10px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;"><i class="fas fa-info-circle"></i> Analysis Details</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        {% for explanation in confidence.explanations %}
+                        <li style="padding: 8px 0; border-bottom: 1px solid #ecf0f1;">
+                            {{ explanation }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Text Attention Analysis -->
+            {% if text_attention and claim_description %}
+            <div class="bg-white rounded-2xl p-8 border-2 border-gray-200 shadow-lg">
+                <h2 class="font-display text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <i class="fas fa-highlighter text-purple-600"></i> 
+                    Claim Description Analysis
+                </h2>
+                
+                <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #4299e1; margin-bottom: 25px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">
+                        <i class="fas fa-file-alt"></i> Highlighted Description
+                    </h3>
+                    <p style="color: #718096; font-size: 0.9rem; margin-bottom: 15px;">
+                        Important keywords are color-coded to show how the description aligns with detected damage:
+                    </p>
+                    
+                    <!-- Legend -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #22c55e20; border: 2px solid #22c55e; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Green</strong> = Detected & Mentioned ✓</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #ef444420; border: 2px solid #ef4444; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Red</strong> = Mentioned but Not Detected ⚠</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #f59e0b20; border: 2px solid #f59e0b; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Orange</strong> = Severity Term</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 20px; height: 20px; background: #3b82f620; border: 2px solid #3b82f6; border-radius: 4px;"></span>
+                            <span style="font-size: 0.85rem; color: #2d3748;"><strong>Blue</strong> = Damage Indicator</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Highlighted Text -->
+                    <div style="background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 2; font-size: 1.05rem;">
+                        {{ text_attention.highlighted_html|safe }}
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                {% if text_attention.statistics %}
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">
+                        <i class="fas fa-chart-bar"></i> Text-Image Consistency Metrics
+                    </h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                            <div class="stat-value" style="color: #22c55e;">{{ text_attention.statistics.matched_parts }}</div>
+                            <div class="stat-label">Matched Parts</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                            <div class="stat-value" style="color: #ef4444;">{{ text_attention.statistics.unmatched_parts }}</div>
+                            <div class="stat-label">Unmatched Parts</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-percentage"></i>
+                            <div class="stat-value">{{ text_attention.statistics.match_rate }}%</div>
+                            <div class="stat-label">Match Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-tag"></i>
+                            <div class="stat-value">{{ text_attention.statistics.severity_terms }}</div>
+                            <div class="stat-label">Severity Terms</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Insights -->
+                {% if text_attention.insights and text_attention.insights|length > 0 %}
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 4px solid #4299e1;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">
+                        <i class="fas fa-lightbulb"></i> AI Insights
+                    </h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% for insight in text_attention.insights %}
+                        <li style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #2d3748;">
+                            {{ insight }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- AI Visualizations -->
+            <div class="bg-white rounded-2xl p-8 border-2 border-gray-200 shadow-lg">
+                <h2 class="font-display text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <i class="fas fa-eye text-purple-600"></i> 
+                    AI Visual Analysis
+                    {% if num_images and num_images > 1 %}
+                    <span class="text-lg font-normal text-gray-600">({{ num_images }} images analyzed)</span>
+                    {% endif %}
+                </h2>
+                
+                <!-- DEBUG: Check what data is available -->
+                <!-- 
+                DEBUG INFO:
+                uploaded_images: {{ uploaded_images }}
+                detected_images: {{ detected_images }}
+                num_images: {{ num_images }}
+                all_image_analyses length: {{ all_image_analyses|length if all_image_analyses else 'None' }}
+                -->
+                
+                <!-- Multiple Images Grid -->
+                {% if uploaded_images and detected_images %}
+                <div class="mb-8" style="border: 2px solid green; padding: 10px;">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-images text-blue-600"></i> 
+                        {% if uploaded_images|length > 1 %}
+                            All Analyzed Images ({{ uploaded_images|length }} total)
+                        {% else %}
+                            Analyzed Image
+                        {% endif %}
+                    </h3>
+                    
+                    <!-- DEBUG: Show raw data -->
+                    <div class="bg-yellow-100 p-3 mb-4 text-xs">
+                        <strong>DEBUG:</strong><br>
+                        Uploaded: {{ uploaded_images }}<br>
+                        Detected: {{ detected_images }}<br>
+                        Analyses: {{ all_image_analyses|length if all_image_analyses else 0 }}
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for i in range(uploaded_images|length) %}
+                        <div class="border-2 {% if worst_severity_idx == i %}border-orange-500{% else %}border-gray-200{% endif %} rounded-xl overflow-hidden hover:border-purple-500 transition-all {% if worst_severity_idx == i %}shadow-lg{% endif %}">
+                            <div class="bg-gradient-to-r {% if worst_severity_idx == i %}from-orange-100 to-red-100{% else %}from-purple-50 to-blue-50{% endif %} px-4 py-2 font-semibold text-gray-800 flex items-center justify-between">
+                                <span>Image {{ i + 1 }}</span>
+                                {% if worst_severity_idx == i %}
+                                <span class="text-xs bg-orange-500 text-white px-2 py-1 rounded-full">
+                                    <i class="fas fa-exclamation-triangle"></i> Worst
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="p-3">
+                                <div class="mb-3">
+                                    <div class="text-sm font-medium text-gray-600 mb-1">Original</div>
+                                    <img src="{{ url_for('static', filename=uploaded_images[i]) }}" 
+                                         alt="Original {{ i + 1 }}" 
+                                         class="w-full rounded-lg shadow">
+                                </div>
+                                <div class="mb-3">
+                                    <div class="text-sm font-medium text-gray-600 mb-1">Detected</div>
+                                    <img src="{{ url_for('static', filename=detected_images[i]) }}" 
+                                         alt="Detected {{ i + 1 }}" 
+                                         class="w-full rounded-lg shadow">
+                                </div>
+                                
+                                <!-- Per-Image Metrics -->
+                                {% if all_image_analyses and i < all_image_analyses|length %}
+                                <div class="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="text-gray-600">
+                                            <i class="fas fa-search"></i> Detections:
+                                        </span>
+                                        <span class="font-semibold text-blue-600">{{ all_image_analyses[i].num_detections }} parts</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="text-gray-600">
+                                            <i class="fas fa-exclamation-circle"></i> Severity:
+                                        </span>
+                                        <span class="font-semibold {% if all_image_analyses[i].severity_score > 60 %}text-red-600{% elif all_image_analyses[i].severity_score > 30 %}text-orange-600{% else %}text-yellow-600{% endif %}">
+                                            {{ all_image_analyses[i].severity_score }}/100
+                                        </span>
+                                    </div>
+                                    {% if all_image_analyses[i].fraud_checked %}
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="text-gray-600">
+                                            <i class="fas fa-shield-alt"></i> Fraud Risk:
+                                        </span>
+                                        <span class="font-semibold {% if all_image_analyses[i].fraud_score > 50 %}text-red-600{% elif all_image_analyses[i].fraud_score > 20 %}text-yellow-600{% else %}text-green-600{% endif %}">
+                                            {{ all_image_analyses[i].fraud_score }}/100
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                    <p class="text-xs text-gray-500 text-center">Analysis pending...</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Summary Info -->
+                    {% if uploaded_images|length > 1 %}
+                    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                        <p class="text-sm text-gray-700">
+                            <i class="fas fa-info-circle text-blue-600"></i>
+                            <strong>Multi-Image Analysis:</strong> All {{ uploaded_images|length }} images were analyzed individually. 
+                            Image {{ worst_severity_idx + 1 }} shows the worst damage and is used for detailed assessment below.
+                        </p>
+                    </div>
+                    {% else %}
+                    <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <p class="text-sm text-gray-700">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <strong>Single Image Analysis:</strong> This image was analyzed for damage detection, severity assessment, and fraud risk.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="mb-8 p-6 bg-red-100 border-2 border-red-500 rounded-xl">
+                    <h3 class="text-xl font-bold text-red-800 mb-3">⚠️ DEBUG: Images Not Displayed</h3>
+                    <div class="text-sm space-y-2">
+                        <p><strong>uploaded_images exists:</strong> {{ 'Yes' if uploaded_images else 'No' }}</p>
+                        <p><strong>uploaded_images value:</strong> {{ uploaded_images }}</p>
+                        <p><strong>detected_images exists:</strong> {{ 'Yes' if detected_images else 'No' }}</p>
+                        <p><strong>detected_images value:</strong> {{ detected_images }}</p>
+                        <p><strong>num_images:</strong> {{ num_images }}</p>
+                        <p><strong>Condition failed:</strong> The IF condition at line 639 is not being met</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Vehicle Consistency Warning (if multiple images) -->
+                {% if num_images and num_images > 1 and vehicle_consistency %}
+                    {% if not vehicle_consistency.is_consistent %}
+                    <!-- FLOATING WARNING: Images might be from different vehicles -->
+                    <div id="floatingConsistencyWarning" 
+                         class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-2xl w-full mx-4"
+                         style="animation: slideDown 0.5s ease-out, pulse 2s infinite;">
+                        <div class="p-5 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl shadow-2xl border-4 border-red-800">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-5xl text-white animate-bounce"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-black text-white text-2xl uppercase tracking-wide">
+                                            ⚠️ FRAUD ALERT: Vehicle Inconsistency
+                                        </h4>
+                                        <button onclick="document.getElementById('floatingConsistencyWarning').style.display='none'" 
+                                                class="text-white hover:text-gray-200 text-2xl font-bold">
+                                            ×
+                                        </button>
+                                    </div>
+                                    <p class="text-white text-base font-bold mb-2">
+                                        {{ vehicle_consistency.reason }}
+                                    </p>
+                                    <div class="grid grid-cols-2 gap-2 mb-3">
+                                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                            <p class="text-white text-xs font-semibold">Confidence</p>
+                                            <p class="text-white text-xl font-black">{{ "%.1f" | format(vehicle_consistency.confidence * 100) }}%</p>
+                                        </div>
+                                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                            <p class="text-white text-xs font-semibold">Min Similarity</p>
+                                            <p class="text-white text-xl font-black">{{ "%.1f" | format(vehicle_consistency.min_similarity * 100) }}%</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3 mb-3">
+                                        <p class="text-red-900 font-black text-sm mb-2">
+                                            <i class="fas fa-shield-alt"></i> POSSIBLE FRAUD INDICATORS:
+                                        </p>
+                                        <ul class="text-red-800 text-xs space-y-1">
+                                            <li class="flex items-center gap-2">
+                                                <span class="text-red-600 font-bold">•</span>
+                                                <span class="font-semibold">Images from DIFFERENT vehicles</span>
+                                            </li>
+                                            <li class="flex items-center gap-2">
+                                                <span class="text-red-600 font-bold">•</span>
+                                                <span class="font-semibold">Heavily edited/manipulated images</span>
+                                            </li>
+                                            <li class="flex items-center gap-2">
+                                                <span class="text-red-600 font-bold">•</span>
+                                                <span class="font-semibold">Stock photos mixed with real images</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-yellow-400 text-yellow-900 rounded-lg p-2">
+                                        <i class="fas fa-user-shield text-xl"></i>
+                                        <p class="font-black text-sm uppercase">
+                                            ⚠️ MANDATORY MANUAL REVIEW REQUIRED
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Compact Success Badge -->
+                    <div class="mb-4">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg">
+                            <i class="fas fa-check-circle text-white text-xl"></i>
+                            <span class="text-white font-bold text-sm">
+                                Vehicle Consistency: VERIFIED ({{ "%.0f" | format(vehicle_consistency.confidence * 100) }}%)
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                
+                <!-- Image Selector (if multiple images) -->
+                {% if num_images and num_images > 1 %}
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-layer-group"></i> Select Image for Detailed Analysis:
+                    </h3>
+                    <div class="flex flex-wrap gap-3">
+                        {% for i in range(num_images) %}
+                        <button data-image-index="{{ i }}" 
+                                id="imageBtn{{ i }}"
+                                class="image-selector-btn px-4 py-2 rounded-lg font-semibold transition-all
+                                       {% if i == worst_severity_idx %}bg-gradient-to-r from-purple-600 to-blue-600 text-white{% else %}bg-gray-200 text-gray-700 hover:bg-gray-300{% endif %}">
+                            <i class="fas fa-image"></i> Image {{ i + 1 }}
+                            {% if i == worst_severity_idx %}
+                            <span class="text-xs ml-1">(Worst)</span>
+                            {% endif %}
+                        </button>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Current Image Metrics (if multiple images) -->
+                    {% if num_images and num_images > 1 and all_image_analyses %}
+                    <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+                        <h4 class="font-semibold text-gray-800 mb-3">Selected Image Metrics:</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600">Detections</p>
+                                <p id="currentDetections" class="text-2xl font-bold text-blue-600">
+                                    {{ all_image_analyses[worst_severity_idx].num_detections if all_image_analyses else 0 }}
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600">Severity</p>
+                                <p id="currentSeverity" class="text-2xl font-bold text-orange-600">
+                                    {{ all_image_analyses[worst_severity_idx].severity_score if all_image_analyses else 0 }}/100
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600">Fraud Risk</p>
+                                <p id="currentFraud" class="text-2xl font-bold text-green-600">
+                                    {{ all_image_analyses[worst_severity_idx].fraud_score if all_image_analyses else 0 }}/100
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Primary Image Comparison (Switchable) -->
+                <div class="image-grid" id="mainImageDisplay">
+                    <div class="image-card">
+                        <div class="image-card-title">
+                            Original Image 
+                            <span id="currentImageNumber" class="text-purple-600 font-bold">
+                                {% if num_images and num_images > 1 %}{{ worst_severity_idx + 1 }}{% endif %}
+                            </span>
+                        </div>
+                        <img id="mainOriginalImg" 
+                             src="{{ url_for('static', filename=original_image) }}" 
+                             alt="Original">
+                    </div>
+                    
+                    <div class="image-card">
+                        <div class="image-card-title">YOLO Damage Detection</div>
+                        <img id="mainDetectedImg"
+                             src="{{ url_for('static', filename=detected_image) }}" 
+                             alt="Detected">
+                    </div>
+                    
+                    <div class="image-card">
+                        <div class="image-card-title">Explainability Annotations</div>
+                        <img id="mainExplanationImg"
+                             src="{{ url_for('static', filename=explanation_image) }}" 
+                             alt="Explanation">
+                    </div>
+                    
+                    <div class="image-card">
+                        <div class="image-card-title">Attention Heatmap</div>
+                        <img id="mainHeatmapImg"
+                             src="{{ url_for('static', filename=heatmap_image) }}" 
+                             alt="Heatmap">
+                    </div>
+                </div>
+                
+                {% if fraud_analysis and fraud_analysis.advanced_forensics and fraud_analysis.advanced_forensics.ela_visualization_path %}
+                <div class="image-grid" style="margin-top: 20px;">
+                    <div class="image-card">
+                        <div class="image-card-title" style="background: #e74c3c;">
+                            🔍 Error Level Analysis (Forensics)
+                        </div>
+                        <img id="mainElaImg" 
+                             src="{{ '/' + fraud_analysis.advanced_forensics.ela_visualization_path }}" 
+                             alt="ELA Forensics">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Severity Analysis -->
+            {% if severity %}
+            <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-8 border border-orange-200">
+                <h2 class="font-display text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <i class="fas fa-exclamation-triangle text-orange-600"></i> 
+                    Damage Severity Assessment
+                </h2>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <span class="severity-badge severity-{{ severity.severity }}">
+                        {{ severity.severity }}
+                    </span>
+                    
+                    <!-- NEW: Rule-Based Explainable Severity -->
+                    {% if severity.rule_based_result %}
+                    <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; border: 2px solid #0ea5e9;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                            <i class="fas fa-lightbulb" style="color: #0ea5e9; font-size: 1.5rem;"></i>
+                            <h4 style="color: #0c4a6e; font-weight: 700; margin: 0;">Why is this <span style="color: #0ea5e9;">{{ severity.severity }}</span>?</h4>
+                        </div>
+                        
+                        <!-- Context Box: Explain what this severity means -->
+                        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #0ea5e9; margin-bottom: 15px;">
+                            <p style="color: #0c4a6e; font-size: 1rem; line-height: 1.6; margin: 0; font-weight: 500;">
+                                {{ severity.explanation }}
+                            </p>
+                        </div>
+                        
+                        <!-- What this severity level means -->
+                        <div style="background: #fef3c7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f59e0b;">
+                            <p style="color: #92400e; margin: 0; font-size: 0.9rem;">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>What {{ severity.severity }} means:</strong>
+                                {% if severity.severity == 'MINIMAL' %}
+                                Very minor cosmetic damage. Can be driven safely. Quick repair possible.
+                                {% elif severity.severity == 'MINOR' %}
+                                Small cosmetic damage. Vehicle is safe to drive. Simple repair needed.
+                                {% elif severity.severity == 'MODERATE' %}
+                                Noticeable damage requiring professional repair. May affect functionality. Get it fixed soon.
+                                {% elif severity.severity == 'SEVERE' %}
+                                Significant damage including safety-critical parts. Immediate repair required. Drive with caution.
+                                {% elif severity.severity == 'TOTAL_LOSS' %}
+                                Extensive damage across multiple critical areas. Vehicle may not be safe to drive. Consider replacement.
+                                {% else %}
+                                No damage detected - vehicle appears clean.
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <!-- How we determined this -->
+                        <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <p style="color: #0c4a6e; font-weight: 600; margin-bottom: 10px; font-size: 0.95rem;">
+                                <i class="fas fa-calculator"></i> How we determined this severity:
+                            </p>
+                            <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                                We analyze <strong>3 key factors</strong> that insurance assessors look at:
+                                <strong>(1) Type of damage</strong> - Critical parts (windscreen, pillars) are more severe,
+                                <strong>(2) How much is damaged</strong> - Larger damage area means higher repair costs,
+                                <strong>(3) Number of damages</strong> - Multiple damages indicate more extensive collision.
+                            </p>
+                        </div>
+                        
+                        <!-- Key Metrics with Context -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                            <!-- Damage Count Card -->
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #bae6fd; position: relative;" title="Number of damaged parts detected">
+                                <div style="color: #0369a1; font-size: 1.8rem; font-weight: 700;">{{ severity.rule_based_result.damage_count }}</div>
+                                <div style="color: #64748b; font-size: 0.85rem; margin-top: 4px; font-weight: 600;">Damaged Parts</div>
+                                <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 6px; line-height: 1.3;">
+                                    {% if severity.rule_based_result.damage_count == 1 %}
+                                    Single damage detected
+                                    {% elif severity.rule_based_result.damage_count <= 3 %}
+                                    A few parts damaged
+                                    {% elif severity.rule_based_result.damage_count <= 5 %}
+                                    Multiple parts affected
+                                    {% else %}
+                                    Extensive damage
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Damage Area Card -->
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #bae6fd; position: relative;" title="Percentage of vehicle surface affected">
+                                <div style="color: #0369a1; font-size: 1.8rem; font-weight: 700;">{{ "%.1f"|format(severity.rule_based_result.total_damage_area) }}%</div>
+                                <div style="color: #64748b; font-size: 0.85rem; margin-top: 4px; font-weight: 600;">Surface Damaged</div>
+                                <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 6px; line-height: 1.3;">
+                                    {% set area = severity.rule_based_result.total_damage_area %}
+                                    {% if area < 5 %}
+                                    Small affected area
+                                    {% elif area < 15 %}
+                                    Moderate coverage
+                                    {% elif area < 25 %}
+                                    Significant coverage
+                                    {% else %}
+                                    Large affected area
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Confidence Card -->
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #bae6fd; position: relative;" title="AI detection confidence">
+                                <div style="color: #0369a1; font-size: 1.8rem; font-weight: 700;">{{ "%.0f"|format(severity.rule_based_result.confidence * 100) }}%</div>
+                                <div style="color: #64748b; font-size: 0.85rem; margin-top: 4px; font-weight: 600;">AI Confidence</div>
+                                <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 6px; line-height: 1.3;">
+                                    {% set conf = severity.rule_based_result.confidence * 100 %}
+                                    {% if conf >= 90 %}
+                                    Very high certainty
+                                    {% elif conf >= 75 %}
+                                    High certainty
+                                    {% elif conf >= 60 %}
+                                    Moderate certainty
+                                    {% else %}
+                                    Review recommended
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if severity.rule_based_result.critical_damage %}
+                        <div style="padding: 12px; background: #fee2e2; border-radius: 8px; border-left: 4px solid #ef4444; margin-bottom: 15px;">
+                            <p style="color: #991b1b; font-weight: 600; margin: 0;">
+                                <i class="fas fa-exclamation-triangle"></i> Critical Damage Detected
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        <details style="margin-top: 10px;">
+                            <summary style="cursor: pointer; color: #0369a1; font-weight: 600; padding: 8px 0;">
+                                <i class="fas fa-chart-pie"></i> View Detailed Scoring Breakdown
+                            </summary>
+                            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
+                                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 15px; line-height: 1.5;">
+                                    Each factor contributes to the final severity score. Higher percentages mean that factor had more influence.
+                                </p>
+                                
+                                {% for factor_name, factor_value in severity.rule_based_result.factors.items() %}
+                                <div style="margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                        <div>
+                                            <span style="color: #475569; font-size: 0.9rem; font-weight: 600; text-transform: capitalize;">
+                                                {% if 'area' in factor_name %}
+                                                📏 Damage Area Score
+                                                {% elif 'count' in factor_name %}
+                                                🔢 Damage Count Score
+                                                {% elif 'type' in factor_name %}
+                                                ⚠️ Damage Type Score
+                                                {% else %}
+                                                {{ factor_name.replace('_', ' ') }}
+                                                {% endif %}
+                                            </span>
+                                            <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 2px;">
+                                                {% if 'area' in factor_name %}
+                                                How much surface is damaged ({{ "%.1f"|format(severity.rule_based_result.total_damage_area) }}% of vehicle)
+                                                {% elif 'count' in factor_name %}
+                                                Number of parts affected ({{ severity.rule_based_result.damage_count }} parts)
+                                                {% elif 'type' in factor_name %}
+                                                Severity of damaged parts (critical parts weigh more)
+                                                {% else %}
+                                                Contributing factor
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <span style="color: #0369a1; font-weight: 700; font-size: 1.1rem;">{{ "%.0f"|format(factor_value * 100) }}%</span>
+                                    </div>
+                                    <div style="height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden;">
+                                        <div style="height: 100%; background: linear-gradient(90deg, #0ea5e9, #06b6d4); width: {{ factor_value * 100 }}%; transition: width 0.3s;"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <div style="margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 6px; border-left: 3px solid #0ea5e9;">
+                                    <p style="color: #475569; font-size: 0.8rem; margin: 0; line-height: 1.5;">
+                                        <strong>💡 How to read this:</strong> The "Damage Type Score" usually has the biggest impact because windscreens and structural parts are more critical than cosmetic panels. "Damage Area" shows repair scope. "Damage Count" indicates collision extent.
+                                    </p>
+                                </div>
+                            </div>
+                        </details>
+                        
+                        <details style="margin-top: 10px;">
+                            <summary style="cursor: pointer; color: #0369a1; font-weight: 600; padding: 8px 0;">
+                                <i class="fas fa-list-ul"></i> View Damage Breakdown
+                            </summary>
+                            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 2px solid #e2e8f0;">
+                                            <th style="text-align: left; padding: 8px; color: #475569; font-size: 0.85rem;">Damage Type</th>
+                                            <th style="text-align: center; padding: 8px; color: #475569; font-size: 0.85rem;">Weight</th>
+                                            <th style="text-align: center; padding: 8px; color: #475569; font-size: 0.85rem;">Area</th>
+                                            <th style="text-align: center; padding: 8px; color: #475569; font-size: 0.85rem;">Confidence</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for damage in severity.rule_based_result.breakdown %}
+                                        <tr style="border-bottom: 1px solid #f1f5f9; {% if damage.is_critical %}background: #fef2f2;{% endif %}">
+                                            <td style="padding: 10px; font-size: 0.9rem;">
+                                                {{ damage.damage_type }}
+                                                {% if damage.is_critical %}<span style="color: #ef4444; margin-left: 5px;"><i class="fas fa-star"></i></span>{% endif %}
+                                            </td>
+                                            <td style="text-align: center; padding: 10px; font-weight: 600; color: #0369a1;">{{ "%.2f"|format(damage.severity_weight) }}</td>
+                                            <td style="text-align: center; padding: 10px;">{{ "%.1f"|format(damage.area_percent) }}%</td>
+                                            <td style="text-align: center; padding: 10px;">{{ "%.0f"|format(damage.confidence * 100) }}%</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <p style="color: #64748b; font-size: 0.8rem; margin-top: 10px; font-style: italic;">
+                                    <i class="fas fa-star" style="color: #ef4444;"></i> = Critical damage (safety/structural concern)
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                    {% endif %}
+                    
+                    {% if severity_enhanced and severity_enhanced.cnn_prediction %}
+                    <div style="margin-top: 20px; padding: 15px; background: #f0f4ff; border-radius: 10px; border-left: 4px solid #667eea;">
+                        <p style="color: #667eea; font-weight: 600; margin-bottom: 8px;">
+                            <i class="fas fa-brain"></i> CNN Raw Prediction: 
+                            <span style="color: #2c3e50;">{{ severity_enhanced.cnn_prediction.severity }}</span>
+                            ({{ "%.1f"|format(severity_enhanced.cnn_prediction.confidence * 100) }}% confidence)
+                        </p>
+                        <p style="color: #7f8c8d; font-size: 0.9rem; margin: 0;">
+                            Final Decision: <strong style="color: #2c3e50;">{{ severity_enhanced.severity }}</strong> 
+                            ({{ severity_enhanced.method }})
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Old redundant elements removed - new explainable section above is more informative -->
+                
+                {% if severity_enhanced and severity_enhanced.cnn_prediction %}
+                <div style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 10px; color: #2c3e50;">
+                        <i class="fas fa-chart-bar"></i> CNN Probability Distribution
+                    </h3>
+                    {% for class_name, prob in severity_enhanced.cnn_prediction.probabilities.items() %}
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>{{ class_name }}</span>
+                            <span>{{ "%.1f"|format(prob * 100) }}%</span>
+                        </div>
+                        <div class="progress-bar" style="height: 20px;">
+                            <div class="progress-fill" style="width: {{ prob * 100 }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Grad-CAM Visualization -->
+                {% if gradcam_image %}
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">
+                        <i class="fas fa-fire"></i> Grad-CAM: Model Attention Visualization
+                    </h3>
+                    <div style="background: white; padding: 15px; border-radius: 10px; border: 2px solid #4299e1;">
+                        <p style="color: #718096; margin-bottom: 15px; font-size: 0.9rem;">
+                            <strong>What is this?</strong> Grad-CAM shows which parts of the image the AI model focused on to predict <strong>{{ severity_enhanced.severity }}</strong> severity. 
+                            Brighter (warmer) regions indicate areas the model considered most important for its decision.
+                        </p>
+                        <div style="text-align: center;">
+                            <img id="mainGradcamImg"
+                                 src="{{ url_for('static', filename=gradcam_image) }}" 
+                                 alt="Grad-CAM Heatmap" 
+                                 style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: #f7fafc; border-radius: 8px; border-left: 4px solid #4299e1;">
+                            <p style="color: #2d3748; font-size: 0.9rem; margin: 0;">
+                                <i class="fas fa-info-circle" style="color: #4299e1;"></i>
+                                <strong>Interpretation:</strong> Red/Yellow areas = High attention | Blue/Purple areas = Low attention
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Fraud Detection -->
+            {% if fraud_analysis %}
+            <div class="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-8 border border-red-200">
+                <h2 class="font-display text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <i class="fas fa-user-secret text-red-600"></i> 
+                    Fraud Detection Analysis
+                </h2>
+                
+                {% if fraud_analysis.advanced_forensics %}
+                <div class="alert {% if fraud_analysis.advanced_forensics.is_manipulated %}alert-danger{% else %}alert-success{% endif %}">
+                    <i class="fas {% if fraud_analysis.advanced_forensics.is_manipulated %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                    <div>
+                        <strong>Image Forensics: {{ 'MANIPULATED' if fraud_analysis.advanced_forensics.is_manipulated else 'AUTHENTIC' }}</strong>
+                        <p style="margin-top: 5px;">
+                            Confidence: {{ "%.1f"|format(fraud_analysis.advanced_forensics.confidence * 100) }}%
+                            {% if fraud_analysis.advanced_forensics.method %}
+                            | Method: {{ fraud_analysis.advanced_forensics.method }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <i class="fas fa-compress"></i>
+                        <div class="stat-value">{{ "%.2f"|format(fraud_analysis.advanced_forensics.ela_score) }}</div>
+                        <div class="stat-label">ELA Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-random"></i>
+                        <div class="stat-value">{{ "%.2f"|format(fraud_analysis.advanced_forensics.noise_inconsistency) }}</div>
+                        <div class="stat-label">Noise Inconsistency</div>
+                    </div>
+                    {% if fraud_analysis.advanced_forensics.cnn_fake_probability %}
+                    <div class="stat-card">
+                        <i class="fas fa-brain"></i>
+                        <div class="stat-value">{{ "%.1f"|format(fraud_analysis.advanced_forensics.cnn_fake_probability * 100) }}%</div>
+                        <div class="stat-label">CNN Fake Probability</div>
+                    </div>
+                    {% endif %}
+                    <div class="stat-card">
+                        <i class="fas fa-camera"></i>
+                        <div class="stat-value">{{ "%.2f"|format(fraud_analysis.advanced_forensics.exif_suspicion) }}</div>
+                        <div class="stat-label">EXIF Suspicion</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if fraud_analysis.duplicate %}
+                <div class="alert {% if fraud_analysis.duplicate.is_duplicate %}alert-warning{% else %}alert-success{% endif %}" style="margin-top: 15px;">
+                    <i class="fas {% if fraud_analysis.duplicate.is_duplicate %}fa-copy{% else %}fa-check{% endif %}"></i>
+                    <div>
+                        <strong>Duplicate Check: {{ 'DUPLICATE FOUND' if fraud_analysis.duplicate.is_duplicate else 'UNIQUE IMAGE' }}</strong>
+                        {% if fraud_analysis.duplicate.is_duplicate %}
+                        <p style="margin-top: 5px;">
+                            Similar to {{ fraud_analysis.duplicate.similar_count }} previous claim(s)
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if fraud_analysis.claim_frequency %}
+                <div class="alert {% if fraud_analysis.claim_frequency.is_suspicious %}alert-warning{% else %}alert-success{% endif %}" style="margin-top: 15px;">
+                    <i class="fas fa-history"></i>
+                    <div>
+                        <strong>Claim Frequency: {{ 'SUSPICIOUS' if fraud_analysis.claim_frequency.is_suspicious else 'NORMAL' }}</strong>
+                        <p style="margin-top: 5px;">
+                            {{ fraud_analysis.claim_frequency.claim_count }} claim(s) in past 30 days
+                            {% if fraud_analysis.claim_frequency.pattern %}
+                            | Pattern: {{ fraud_analysis.claim_frequency.pattern }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Repair Costs -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
+                <h2 class="font-display text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <i class="fas fa-indian-rupee-sign text-green-600"></i> 
+                    Estimated Repair Costs
+                </h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-cog"></i> Part Name</th>
+                            <th><i class="fas fa-hashtag"></i> Count</th>
+                            <th><i class="fas fa-indian-rupee-sign"></i> Price per Part</th>
+                            <th><i class="fas fa-indian-rupee-sign"></i> Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if part_prices and part_prices|length > 0 %}
+                            {% for part, details in part_prices.items() %}
+                            <tr>
+                                <td><strong>{{ part }}</strong></td>
+                                <td>{{ details.get('count', 0) }}</td>
+                                <td>₹{{ "{:,.0f}".format(details.get('price', 0)) }}</td>
+                                <td>₹{{ "{:,.0f}".format(details.get('total', 0)) }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 20px; color: #718096;">
+                                    No part price data available
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                
+                <div class="total-cost">
+                    <i class="fas fa-indian-rupee-sign"></i> 
+                    Total Estimated Cost: ₹{{ "{:,.0f}".format(part_prices.values() | map(attribute='total') | sum) if part_prices else 0 }}
+                </div>
+                
+                {% if cost_band and cost_band.band %}
+                <div style="text-align: center; margin-top: 20px;">
+                    <span class="cost-band cost-{{ cost_band.band }}">
+                        {{ cost_band.band }} Risk Category
+                    </span>
+                    <p style="margin-top: 10px; color: #7f8c8d;">
+                        Risk Level: {{ cost_band.get('risk', 'Unknown') }}
+                    </p>
+                </div>
+                {% else %}
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                    <p style="color: #718096;">Cost band information not available</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Textual Explanation -->
+            {% if textual_explanation %}
+            <div class="bg-gray-50 rounded-2xl p-8 border-2 border-gray-300">
+                <h2 class="font-display text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <i class="fas fa-file-alt text-gray-600"></i> 
+                    Detailed Analysis Report
+                </h2>
+                <div class="explanation-text">{{ textual_explanation }}</div>
+            </div>
+            {% endif %}
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-4 justify-center pt-8">
+                <button onclick="window.print()" class="flex items-center space-x-2 px-8 py-4 gradient-bg text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all">
+                    <i class="fas fa-print"></i>
+                    <span>Print Report</span>
+                </button>
+                <a href="/dashboard" class="flex items-center space-x-2 px-8 py-4 bg-white border-2 border-purple-500 text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-all">
+                    <i class="fas fa-plus"></i>
+                    <span>New Analysis</span>
+                </a>
+                <button onclick="window.location.href='/'" class="flex items-center space-x-2 px-8 py-4 bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="max-w-7xl mx-auto mt-8 text-center text-gray-500 text-sm pb-8">
+        <p>© 2024 ESPER - Enhanced Smart Policy Estimation & Risk Assessment</p>
+        <p class="mt-2">AI-Powered Insurance Claim Analysis Platform</p>
+    </div>
+</body>
+</html>
+    
+    <script>
+        // Animate progress bars on load
+        window.addEventListener('load', function() {
+            const fills = document.querySelectorAll('.progress-fill');
+            fills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        });
+        
+        // Animate confidence score
+        const scoreElement = document.querySelector('.confidence-score');
+        if (scoreElement) {
+            const targetScore = parseFloat(scoreElement.textContent);
+            let currentScore = 0;
+            const increment = targetScore / 50;
+            const timer = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = currentScore.toFixed(1) + '%';
+            }, 20);
+        }
+        
+        // Image switching functionality for multi-image analysis
+        {% if num_images and num_images > 1 %}
+        const imageData = {
+            uploaded: {{ uploaded_images | tojson }},
+            detected: {{ detected_images | tojson }},
+            explanation: {{ explanation_images | tojson }},
+            heatmap: {{ heatmap_images | tojson }},
+            gradcam: {{ gradcam_images | tojson }},
+            ela: {{ ela_images | tojson }},
+            analyses: {{ all_image_analyses | tojson }}
+        };
+        
+        let currentImageIndex = {{ worst_severity_idx }};
+        
+        // Add click event listeners to image selector buttons
+        document.querySelectorAll('.image-selector-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-image-index'));
+                switchImage(index);
+            });
+        });
+        
+        function switchImage(index) {
+            if (index < 0 || index >= imageData.uploaded.length) return;
+            
+            currentImageIndex = index;
+            
+            // Update main images
+            const originalImg = document.getElementById('mainOriginalImg');
+            const detectedImg = document.getElementById('mainDetectedImg');
+            const explanationImg = document.getElementById('mainExplanationImg');
+            const heatmapImg = document.getElementById('mainHeatmapImg');
+            const gradcamImg = document.getElementById('mainGradcamImg');
+            const elaImg = document.getElementById('mainElaImg');
+            const imageNumber = document.getElementById('currentImageNumber');
+            
+            const baseUrl = "{{ url_for('static', filename='') }}";
+            
+            if (originalImg) {
+                originalImg.src = baseUrl + imageData.uploaded[index];
+            }
+            if (detectedImg) {
+                detectedImg.src = baseUrl + imageData.detected[index];
+            }
+            if (explanationImg && imageData.explanation && imageData.explanation[index]) {
+                explanationImg.src = baseUrl + imageData.explanation[index];
+            }
+            if (heatmapImg && imageData.heatmap && imageData.heatmap[index]) {
+                heatmapImg.src = baseUrl + imageData.heatmap[index];
+            }
+            if (gradcamImg && imageData.gradcam && imageData.gradcam[index]) {
+                gradcamImg.src = baseUrl + imageData.gradcam[index];
+            }
+            if (elaImg && imageData.ela && imageData.ela[index]) {
+                elaImg.src = '/' + imageData.ela[index];
+            }
+            if (imageNumber) {
+                imageNumber.textContent = (index + 1);
+            }
+            
+            // Update metrics
+            if (imageData.analyses && imageData.analyses[index]) {
+                const analysis = imageData.analyses[index];
+                
+                const detectionsEl = document.getElementById('currentDetections');
+                const severityEl = document.getElementById('currentSeverity');
+                const fraudEl = document.getElementById('currentFraud');
+                
+                if (detectionsEl) detectionsEl.textContent = analysis.num_detections || 0;
+                if (severityEl) severityEl.textContent = (analysis.severity_score || 0) + '/100';
+                if (fraudEl) fraudEl.textContent = (analysis.fraud_score || 0) + '/100';
+                
+                // Update color coding
+                if (severityEl) {
+                    severityEl.className = 'text-2xl font-bold';
+                    if (analysis.severity_score > 60) {
+                        severityEl.classList.add('text-red-600');
+                    } else if (analysis.severity_score > 30) {
+                        severityEl.classList.add('text-orange-600');
+                    } else {
+                        severityEl.classList.add('text-yellow-600');
+                    }
+                }
+                
+                if (fraudEl) {
+                    fraudEl.className = 'text-2xl font-bold';
+                    if (analysis.fraud_score > 50) {
+                        fraudEl.classList.add('text-red-600');
+                    } else if (analysis.fraud_score > 20) {
+                        fraudEl.classList.add('text-yellow-600');
+                    } else {
+                        fraudEl.classList.add('text-green-600');
+                    }
+                }
+            }
+            
+            // Update button states
+            document.querySelectorAll('.image-selector-btn').forEach((btn, i) => {
+                if (i === index) {
+                    btn.className = 'image-selector-btn px-4 py-2 rounded-lg font-semibold transition-all bg-gradient-to-r from-purple-600 to-blue-600 text-white';
+                } else {
+                    btn.className = 'image-selector-btn px-4 py-2 rounded-lg font-semibold transition-all bg-gray-200 text-gray-700 hover:bg-gray-300';
+                }
+            });
+        }
+        {% endif %}
+    </script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Claim - ESPER Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Drag and drop animation */
+        .drag-over {
+            border-color: #667eea !important;
+            background-color: #f3f4f6 !important;
+            transform: scale(1.02);
+        }
+        
+        /* File upload animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        /* Loading spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Preview image animation */
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .zoom-in {
+            animation: zoomIn 0.3s ease-out;
+        }
+        
+        /* Navbar blur */
+        .navbar-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar-blur fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="{{ url_for('index') }}" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
+                        <i class="fas fa-car-crash text-white text-xl"></i>
+                    </div>
+                    <span class="font-display text-2xl font-bold gradient-text">ESPER</span>
+                </a>
+                
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-2 text-gray-600">
+                        <i class="fas fa-user-circle text-xl"></i>
+                        <span class="font-medium hidden sm:inline">{{ session.get('user_email', 'User') }}</span>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="text-gray-600 hover:text-red-500 transition-colors">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto">
+            
+            <!-- Header -->
+            <div class="text-center mb-12 fade-in-up">
+                <h1 class="font-display text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Upload Damage <span class="gradient-text">Report</span>
+                </h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Upload vehicle damage photos and our AI will analyze them in seconds
+                </p>
+            </div>
+            
+            <!-- Upload Form -->
+            <form method="POST" enctype="multipart/form-data" id="uploadForm" class="fade-in-up" style="animation-delay: 0.1s">
+                
+                <!-- Image Upload Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-6">
+                    <div class="mb-8">
+                        <h3 class="font-display text-2xl font-bold text-gray-900 mb-2 flex items-center">
+                            <i class="fas fa-image text-purple-600 mr-3"></i>
+                            Damage Photo
+                        </h3>
+                        <p class="text-gray-600">Upload a clear photo of the damaged vehicle</p>
+                    </div>
+                    
+                    <!-- Drag and Drop Zone -->
+                    <div class="border-3 border-dashed border-gray-300 rounded-xl p-12 text-center transition-all hover:border-purple-400 cursor-pointer" 
+                         id="dropZone">
+                        <div id="uploadPlaceholder">
+                            <div class="mb-6">
+                                <i class="fas fa-cloud-upload-alt text-6xl text-gray-400"></i>
+                            </div>
+                            <h4 class="font-semibold text-lg text-gray-700 mb-2">
+                                Drag & drop your image here
+                            </h4>
+                            <p class="text-gray-500 mb-4">or</p>
+                            <label for="image" class="inline-block cursor-pointer">
+                                <span class="gradient-bg text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                    Browse Files
+                                </span>
+                                <input type="file" 
+                                       name="images" 
+                                       id="image" 
+                                       accept="image/*" 
+                                       class="hidden" 
+                                       multiple
+                                       required>
+                            </label>
+                            <p class="text-sm text-gray-400 mt-4">
+                                Supports: JPG, PNG, WEBP (Max 10MB)
+                            </p>
+                        </div>
+                        
+                        <!-- Image Previews (hidden initially) -->
+                        <div id="imagePreview" class="hidden">
+                            <div id="previewContainer" class="grid grid-cols-2 gap-4 mb-4"></div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-4">
+                                    <i class="fas fa-images"></i> 
+                                    <span id="imageCount">0</span> image(s) selected
+                                </p>
+                                <div class="flex items-center justify-center space-x-4">
+                                    <button type="button" 
+                                            onclick="removeAllImages()" 
+                                            class="text-red-600 hover:text-red-700 font-semibold flex items-center space-x-2">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>Remove All</span>
+                                    </button>
+                                    <span class="text-gray-400">|</span>
+                                    <label for="image" class="text-purple-600 hover:text-purple-700 font-semibold cursor-pointer flex items-center space-x-2">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <span>Add More</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-6">
+                    <div class="mb-6">
+                        <h3 class="font-display text-2xl font-bold text-gray-900 mb-2 flex items-center">
+                            <i class="fas fa-file-alt text-purple-600 mr-3"></i>
+                            Claim Description
+                        </h3>
+                        <p class="text-gray-600">Describe the damage in detail (optional but recommended)</p>
+                    </div>
+                    
+                    <textarea name="description" 
+                              id="description"
+                              rows="5" 
+                              class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none"
+                              placeholder="Example: The front bumper and headlight were damaged in a collision. There's also a dent on the front-left door..."
+                    ></textarea>
+                    
+                    <div class="mt-4 flex items-center space-x-4 text-sm text-gray-500">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-lightbulb text-yellow-500"></i>
+                            <span>Include part names for better analysis</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>Mention severity if known</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Features Preview -->
+                <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-8 mb-6 border border-purple-200">
+                    <h3 class="font-display text-xl font-bold text-gray-900 mb-6 text-center">
+                        <i class="fas fa-sparkles text-purple-600 mr-2"></i>
+                        What Our AI Will Analyze
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center">
+                            <i class="fas fa-search-plus text-3xl text-purple-600 mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-1">Damage Detection</h4>
+                            <p class="text-sm text-gray-600">Identify all damaged parts</p>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center">
+                            <i class="fas fa-indian-rupee-sign text-3xl text-green-600 mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-1">Cost Estimation</h4>
+                            <p class="text-sm text-gray-600">Instant repair cost in ₹</p>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center">
+                            <i class="fas fa-shield-alt text-3xl text-blue-600 mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-1">Fraud Detection</h4>
+                            <p class="text-sm text-gray-600">Authenticity verification</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="flex justify-center">
+                    <button type="submit" 
+                            id="submitBtn"
+                            class="gradient-bg text-white px-12 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all flex items-center space-x-3">
+                        <i class="fas fa-magic"></i>
+                        <span>Analyze Now</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Processing Overlay (hidden initially) -->
+            <div id="processingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                <div class="bg-white rounded-2xl p-10 text-center max-w-md mx-4">
+                    <div class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-brain text-white text-3xl spinner"></i>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold text-gray-900 mb-3">
+                        AI is Analyzing...
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        Please wait while our AI processes the damage report
+                    </p>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="gradient-bg h-2 rounded-full animate-pulse" style="width: 70%"></div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <script>
+        // Drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('image');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewContainer = document.getElementById('previewContainer');
+        const imageCountSpan = document.getElementById('imageCount');
+        const uploadForm = document.getElementById('uploadForm');
+        const processingOverlay = document.getElementById('processingOverlay');
+        
+        let selectedFiles = [];
+        
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // Highlight drop zone when dragging over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('drag-over');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('drag-over');
+            }, false);
+        });
+        
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFiles(files);
+            }
+        });
+        
+        // Handle file input change
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            // Add files to selectedFiles array
+            for (let file of files) {
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please upload only image files');
+                    continue;
+                }
+                
+                // Validate file size (10MB max)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`File ${file.name} is too large (max 10MB)`);
+                    continue;
+                }
+                
+                selectedFiles.push(file);
+            }
+            
+            // Update preview
+            updatePreviews();
+        }
+        
+        function updatePreviews() {
+            if (selectedFiles.length === 0) {
+                uploadPlaceholder.classList.remove('hidden');
+                imagePreview.classList.add('hidden');
+                return;
+            }
+            
+            uploadPlaceholder.classList.add('hidden');
+            imagePreview.classList.remove('hidden');
+            
+            // Clear previous previews
+            previewContainer.innerHTML = '';
+            
+            // Create preview for each image
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'relative group';
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" 
+                             class="w-full h-48 object-cover rounded-lg shadow-lg zoom-in">
+                        <button type="button" 
+                                onclick="removeImage(${index})" 
+                                class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs">
+                            Image ${index + 1}
+                        </div>
+                    `;
+                    previewContainer.appendChild(previewDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // Update count
+            imageCountSpan.textContent = selectedFiles.length;
+        }
+        
+        function removeImage(index) {
+            selectedFiles.splice(index, 1);
+            updatePreviews();
+        }
+        
+        function removeAllImages() {
+            selectedFiles = [];
+            fileInput.value = '';
+            updatePreviews();
+        }
+        
+        // Form submission
+        uploadForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent default form submission
+            
+            if (selectedFiles.length === 0) {
+                alert('Please upload at least one image');
+                return;
+            }
+            
+            // Create FormData and append all selected files
+            const formData = new FormData();
+            
+            // Append all images from selectedFiles array
+            selectedFiles.forEach((file, index) => {
+                formData.append('images', file);
+            });
+            
+            // Append description
+            const description = document.getElementById('description').value;
+            formData.append('description', description);
+            
+            // Show processing overlay
+            processingOverlay.classList.remove('hidden');
+            
+            // Submit via fetch
+            fetch('/dashboard', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirect to results (response is HTML)
+                    return response.text();
+                }
+                throw new Error('Upload failed');
+            })
+            .then(html => {
+                // Replace entire page with response
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => {
+                processingOverlay.classList.add('hidden');
+                alert('Error uploading images: ' + error.message);
+            });
+        });
+    </script>
+    
+</body>
+</html>
