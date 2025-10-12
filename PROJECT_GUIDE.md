@@ -25,16 +25,20 @@
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Setup database
+# 2. Setup environment variables
+cp .env.example .env
+# Edit .env with your MySQL credentials
+
+# 3. Setup database
 mysql -u root -p < db_schema.sql
 
-# 3. Configure environment
-# Update config.py with your MySQL credentials
+# 4. Load pricing data
+python3 utilities/auto_insert_pricing.py
 
-# 4. Run application
+# 5. Run application
 python3 app.py
 
-# 5. Access
+# 6. Access
 # Frontend: http://localhost:5000
 ```
 
@@ -248,7 +252,7 @@ DAMAGE_CLASS_WEIGHTS = {
 
 **Adjust Factor Weights:**
 
-Edit `app.py` line 55:
+Edit `app.py` (find RuleBasedSeverityAssessor initialization):
 
 ```python
 rule_based_severity = RuleBasedSeverityAssessor(
@@ -275,9 +279,8 @@ rule_based_severity = RuleBasedSeverityAssessor(
 
 **1. Clone Repository:**
 ```bash
-cd ~/Desktop
-git clone <your-repo-url> git-one
-cd git-one
+git clone <your-repo-url>
+cd <repository-name>
 ```
 
 **2. Install Python Dependencies:**
@@ -296,19 +299,23 @@ mysql -u root -p car_damage_detection < db_schema.sql
 
 **4. Configure Application:**
 
-Edit `config.py`:
-```python
-mysql_credentials = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'your_password',
-    'database': 'car_damage_detection',
-}
+Create `.env` file from template:
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your credentials:
+```bash
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=your_password
+MYSQL_DATABASE=car_damage_detection
+SECRET_KEY=your-secret-key-here
 ```
 
 **5. Add Car Pricing Data:**
 ```bash
-python3 generate_17_class_pricing.py
+python3 utilities/auto_insert_pricing.py
 ```
 
 **6. Run Application:**
@@ -413,8 +420,11 @@ DAMAGE_CLASS_WEIGHTS = {
 **3. Add pricing:**
 
 ```python
-# In generate_17_class_pricing.py
-"new-damage-type": base_price * factor
+# In utilities/auto_insert_pricing.py
+BASE_PRICES = {
+    'new-damage-type': 10000,  # Add base price
+    # ... existing prices
+}
 ```
 
 ### Customize UI
@@ -487,15 +497,14 @@ result = detector.analyze_fraud(...)
 ## 📁 Project Structure
 
 ```
-git-one/
+project-root/
 ├── app.py                          # Main Flask application
-├── config.py                       # Configuration
+├── config.py                       # Configuration (uses .env)
 ├── requirements.txt                # Python dependencies
+├── .env.example                    # Environment config template
 │
 ├── Core AI Modules
 │   ├── rule_based_severity.py     # ⭐ NEW Interpretable severity
-│   ├── severity_classifier.py     # (Deprecated - CNN-based)
-│   ├── damage_severity.py         # Old rule-based
 │   ├── gradcam_explainer.py       # Explainable AI
 │   ├── text_attention.py          # NLP attention
 │   ├── vehicle_consistency_checker.py  # Fraud detection
@@ -515,10 +524,13 @@ git-one/
 ├── models/                         # AI model weights
 │   └── fine-tuned.pt              # YOLO model
 │
+├── utilities/                      # Utility scripts
+│   └── auto_insert_pricing.py     # Database pricing setup
+│
 ├── Database
 │   ├── db_schema.sql              # Database structure
 │   ├── car_parts_prices_17_classes.json  # Pricing data
-│   └── db_migration_phone_fix.sql  # Database updates
+│   └── enhanced_db_schema.sql     # Enhanced schema
 │
 └── PROJECT_GUIDE.md               # This file
 ```

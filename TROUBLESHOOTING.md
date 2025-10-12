@@ -22,10 +22,11 @@ mysql -u root -p < db_migration_phone_fix.sql
 # 1. Check MySQL is running
 sudo systemctl status mysql
 
-# 2. Update .env credentials
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
+# 2. Update .env file with correct credentials
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=your_password
+MYSQL_DATABASE=car_damage_detection
 ```
 
 ---

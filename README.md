@@ -20,13 +20,20 @@ An enterprise-grade **Insurance Claim Analysis System** that combines **Computer
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Setup database
+# 2. Setup environment variables
+cp .env.example .env
+# Edit .env with your MySQL credentials
+
+# 3. Setup database
 mysql -u root -p < db_schema.sql
 
-# 3. Run application
+# 4. Load pricing data
+python3 utilities/auto_insert_pricing.py
+
+# 5. Run application
 python3 app.py
 
-# 4. Access at http://localhost:5000
+# 6. Access at http://localhost:5000
 ```
 
 ---
@@ -94,12 +101,16 @@ User Upload → YOLO Detection → Rule-Based Severity → Fraud Detection → R
 ## 📁 Project Structure
 
 ```
-git-one/
+project-root/
 ├── app.py                          # Main Flask application
+├── config.py                       # Database configuration
 ├── rule_based_severity.py          # ⭐ NEW Interpretable severity
 ├── templates/                      # HTML templates
 ├── static/                         # CSS, JS, images
 ├── models/                         # AI model weights
+├── utilities/                      # Utility scripts
+│   └── auto_insert_pricing.py     # Database pricing setup
+├── .env.example                    # Environment config template
 └── PROJECT_GUIDE.md                # Complete documentation
 ```
 
