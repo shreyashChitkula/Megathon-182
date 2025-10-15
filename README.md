@@ -16,6 +16,15 @@ https://github.com/user-attachments/assets/dcd1d33e-c63a-4a05-a356-2c839ca69c1a
 
 [ESPER-PPT.pdf](https://github.com/user-attachments/files/22932870/ESPER-PPT.pdf)
 
+---
+
+## 🚄 Training The Yolov8 Model
+
+https://universe.roboflow.com/sindhu/car_dent_scratch_detection-1/dataset/5
+
+Download the above dataset and use the training scripts provided to train ✅
+
+---
 
 ## 📖 Documentation
 
