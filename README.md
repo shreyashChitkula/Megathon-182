@@ -7,6 +7,15 @@
 An enterprise-grade **Insurance Claim Analysis System** that combines **Computer Vision (YOLOv8)** with **Interpretable AI** to provide comprehensive, explainable, and fraud-resistant vehicle damage assessment.
 
 ---
+## 📽️ The Application
+
+
+https://github.com/user-attachments/assets/dcd1d33e-c63a-4a05-a356-2c839ca69c1a
+
+## 🗃️ Presentation
+
+[ESPER-PPT.pdf](https://github.com/user-attachments/files/22932870/ESPER-PPT.pdf)
+
 
 ## 📖 Documentation
 
